@@ -11,7 +11,7 @@ load_dotenv()
 # מודל הAI והפרופמט
 MODEL = "gemini-3.8-flash"
 # SYSTEM_PROMPT = "תמיר את ההוראה/בקשה שהתקבלה לפקודה שמוכנה להרצה בשורת הפקודה, ללא מלל מיותר. רק פקודה"
-PROMPT_FILE = "prompt.md"
+PROMPT_FILE = "prompt_v2.md"
 
 # המרת הפרופמט לעברית תקינה
 def load_prompt():

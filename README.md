@@ -54,16 +54,6 @@ The active prompt is selected by the `PROMPT_FILE` variable in the code. Each ve
 - **Temperature:** 0, so the same instruction gives the same command and iterations can be compared fairly.
 - **Target environment:** Windows 11, PowerShell.
 
-## Prompt iterations
-
-Each iteration changes the prompt, is tested, and is scored in the Google Sheet (one tab per iteration).
-
-| Iteration | File | What changed |
-|---|---|---|
-| 1 | `prompt_v1.md` | A single-sentence prompt: convert the request into a command to run in the terminal. No target OS, no format rules. |
-| 2 | `prompt_v2.md` | Added a role, a target of **Windows PowerShell**, an explicit output-format rule (no text around the command), and four few-shot examples. |
-| 3 | `prompt_v3.md` | TODO: describe what changed (for example the safety rules and the handling of non-command requests). |
-
 
 ## Test scenarios and results
 

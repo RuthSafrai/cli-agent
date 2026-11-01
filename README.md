@@ -1,78 +1,72 @@
-<div dir="rtl">
-
 # Text to CLI Agent
 
-agent שמקבל הוראה בשפה טבעית (עברית או אנגלית) ומחזיר פקודה אחת לשורת הפקודה.
+An agent that takes an instruction in natural language (Hebrew or English) and returns a single command-line command.
 
-הקוד בפרויקט פשוט בכוונה. העבודה המרכזית היא **הנדסת פרומפטים**: ניסוח, בדיקה, מדידה ושיפור, בכמה איטרציות.
+The code in this project is intentionally simple. The main work is prompt engineering: writing, testing, measuring, and improving the prompt over several iterations.
 
-לדוגמה:
+Examples:
 
-| הוראה בשפה טבעית | פקודה |
+| Natural-language instruction | Command |
 |---|---|
-| מה כתובת ה-IP של המחשב שלי | `ipconfig` |
-| איזה תהליכים רצים כרגע במערכת | `tasklist` |
+| What is my computer's IP address? | `ipconfig` |
+| Which processes are currently running on the system? | `tasklist` |
 
-> ה-agent **רק כותב** פקודה. הוא לא מריץ אותה.
+The agent only writes the command. It does not run it.
 
----
+## How to run
 
-## איך מריצים
- 
-דרישות: [uv](https://docs.astral.sh/uv/) ומפתח API של Gemini מ-[Google AI Studio](https://aistudio.google.com/api-keys).
- 
+Requirements: [uv](https://docs.astral.sh/uv/) and a Gemini API key from Google AI Studio.
+
 ```bash
 uv sync
 ```
- 
-יוצרים קובץ `.env` בשורש הפרויקט (הוא לא עולה ל-Git):
- 
+
+Create a `.env` file in the project root (it is not committed to Git):
+
 ```
 GEMINI_API_KEY=your_key_here
 ```
- 
-מריצים:
- 
+
+Run:
+
 ```bash
 uv run cli-agent
 ```
- 
-הממשק (Gradio) נפתח בדפדפן בכתובת `http://127.0.0.1:7860`.
- 
-## מבנה הפרויקט
+
+The Gradio interface opens in your browser at http://127.0.0.1:7860.
+
+## Project structure
 
 ```
 src/cli_agent/
-  __init__.py      # הקוד: טעינת הפרומפט, קריאה ל-LLM, ממשק Gradio
-  prompt.md     # פרומפט 
-  
+  __init__.py   # The code: loading the prompt, calling the LLM, Gradio UI
+  prompt.md     # The prompt
 ```
 
+## Test scenarios and results
 
-## תרחישי בדיקה ותוצאות
-
-כל התרחישים והתוצאות מתועדים ב-Google Sheet, עם כותרת נפרדת לכל איטרציה:
+All scenarios and results are documented in a Google Sheet, with a separate heading for each iteration:
 
 https://docs.google.com/spreadsheets/d/1gIPDSFmup1T3tnVxdpPOsW3-dmMNhnNEl9SWr-VyTWo/edit?usp=sharing
 
-מדדי ההערכה בגיליון:
+Evaluation metrics in the sheet:
 
+- Valid to run
+- Safe
+- Suitable for Windows 11, runnable in PowerShell
 
-- תקין להרצה
-- בטיחותי
-- מתאים לwindows11, להרצה בpowershell
+## Interesting failures and what I learned from them
 
-## הכשלים המעניינים ומה למדתי מהם
+### 1. Without an explicit definition, the model mixes operating systems
 
-### 1. בלי הגדרה מפורשת, המודל מערבב מערכות הפעלה
+**What happened:** With the simple prompt, many of the answers were Linux commands (`ps aux`, `ls -la`, `df -h`, `rm`, `cp`), even though the computer runs Windows.
 
-- **מה קרה:** בפרומפט הפשוט, חלק גדול מהתשובות היו פקודות Linux (`ps aux`, `ls -la`, `df -h`, `rm`, `cp`), למרות שהמחשב הוא Windows.
-- **למה זו בעיה:** הפקודות לא רצות, גם אם הן תקינות כשלעצמן.
-- לכן הוספתי הדגשה שמתאים לwindows11
+**Why it's a problem:** The commands don't run, even if they are valid on their own.
 
-### 2. פקודה שנראית תקינה אבל לא רצה בפועל
-- **מה קרה:** על השאלה על מקום פנוי בדיסק, המודל החזיר `wmic logicaldisk get caption,freespace,size`. ב-PowerShell במחשב שלי התקבלה השגיאה `wmic is not recognized`, כי הכלי הוצא משימוש.
-- **למה זו בעיה:** הפקודה עוברת בדיקת תחביר ונכשלת בהרצה.
+**Fix:** I added an explicit requirement that the command must be suitable for Windows 11.
 
+### 2. A command that looks valid but doesn't actually run
 
-</div>
+**What happened:** For a question about free disk space, the model returned `wmic logicaldisk get caption,freespace,size`. In PowerShell on my machine, I got the error `wmic is not recognized`, because the tool has been deprecated.
+
+**Why it's a problem:** The command passes a syntax check but fails at runtime.

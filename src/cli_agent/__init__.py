@@ -9,9 +9,8 @@ from pathlib import Path
 load_dotenv()
 
 # מודל הAI והפרופמט
-MODEL = "gemini-3.8-flash"
-# SYSTEM_PROMPT = "תמיר את ההוראה/בקשה שהתקבלה לפקודה שמוכנה להרצה בשורת הפקודה, ללא מלל מיותר. רק פקודה"
-PROMPT_FILE = "prompt_v2.md"
+MODEL = "gemini-3.6-flash"
+PROMPT_FILE = "prompt_v3.md"
 
 # המרת הפרופמט לעברית תקינה
 def load_prompt():
